@@ -8,7 +8,7 @@ import { createUser, deleteUser, updateUser } from "@/lib/actions/user.actions";
 import { connectToDatabase } from "@/lib/Database/mongoose"; // Import the database connection
 
 export async function POST(req: Request) {
-  console.log("Webhook endpoint hit at:", new Date().toISOString());
+ 
 
   const WEBHOOK_SECRET = process.env.WEBHOOK_SECRET;
 

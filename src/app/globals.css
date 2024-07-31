@@ -84,14 +84,14 @@
 }
 
 .root-container {
-  @apply mt-16 flex-1 overflow-auto py-8 lg:mt-0 lg:max-h-screen lg:py-10
+  @apply mt-28 flex-1 overflow-auto py-8 lg:mt-20 lg:max-h-screen lg:py-10
 }
 
 /* ========================================== TAILWIND STYLES */
 @layer utilities {
   /* ===== UTILITIES */
   .wrapper {
-    @apply max-w-5xl mx-auto px-5 md:px-10 w-full text-dark-400 p-16-regular;
+    @apply max-w-5xl mt-16 mx-auto px-5 md:px-10 w-full text-dark-400 p-16-regular;
   }
 
   .gradient-text {
