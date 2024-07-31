@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 import { clerkClient } from "@clerk/nextjs/server";
 import { WebhookEvent } from "@clerk/nextjs/server";
 import { headers } from "next/headers";
@@ -6,16 +5,16 @@ import { NextResponse } from "next/server";
 import { Webhook } from "svix";
 
 import { createUser, deleteUser, updateUser } from "@/lib/actions/user.actions";
+import { connectToDatabase } from "@/lib/Database/mongoose"; // Import the database connection
 
 export async function POST(req: Request) {
-  // You can find this in the Clerk Dashboard -> Webhooks -> choose the webhook
+  console.log("Webhook endpoint hit at:", new Date().toISOString());
+
   const WEBHOOK_SECRET = process.env.WEBHOOK_SECRET;
-  
 
   if (!WEBHOOK_SECRET) {
-    throw new Error(
-      "Please add WEBHOOK_SECRET from Clerk Dashboard to .env or .env.local"
-    );
+    console.error("WEBHOOK_SECRET is not set");
+    return new Response("WEBHOOK_SECRET is not set", { status: 500 });
   }
 
   // Get the headers
@@ -26,13 +25,20 @@ export async function POST(req: Request) {
 
   // If there are no headers, error out
   if (!svix_id || !svix_timestamp || !svix_signature) {
-    return new Response("Error occured -- no svix headers", {
+    console.error("Error occurred -- no svix headers");
+    return new Response("Error occurred -- no svix headers", {
       status: 400,
     });
   }
 
   // Get the body
-  const payload = await req.json();
+  let payload: any;
+  try {
+    payload = await req.json();
+  } catch (err) {
+    console.error("Error parsing request body:", err);
+    return new Response("Error parsing request body", { status: 400 });
+  }
   const body = JSON.stringify(payload);
 
   // Create a new Svix instance with your secret.
@@ -47,76 +53,100 @@ export async function POST(req: Request) {
       "svix-timestamp": svix_timestamp,
       "svix-signature": svix_signature,
     }) as WebhookEvent;
+    console.log("Webhook verified successfully");
   } catch (err) {
     console.error("Error verifying webhook:", err);
-    return new Response("Error occured", {
+    return new Response("Error verifying webhook", {
       status: 400,
     });
+  }
+
+  // Connect to the database
+  try {
+    await connectToDatabase();
+    console.log("Connected to database");
+  } catch (error) {
+    console.error("Error connecting to database:", error);
+    return new Response("Error connecting to database", { status: 500 });
   }
 
   // Get the ID and type
   const { id } = evt.data;
   const eventType = evt.type;
-  console.log(`Webhook with and ID of ${id} and type of ${eventType}`)
-  console.log('Webhook body:', body)
+  console.log(`Webhook with ID of ${id} and type of ${eventType}`);
 
   // CREATE
   if (eventType === "user.created") {
-    const { id, email_addresses, image_url, first_name, last_name, username } = evt.data;
-    
+    try {
+      const { id, email_addresses, image_url, first_name, last_name, username } = evt.data;
 
-    const user = {
-      clerkId: id,
-      email: email_addresses[0].email_address,
-      username: username!,
-      firstName: first_name,
-      lastName: last_name,
-      photo: image_url,
-    };
+      const user = {
+        clerkId: id,
+        email: email_addresses[0].email_address,
+        username: username!,
+        firstName: first_name,
+        lastName: last_name,
+        photo: image_url,
+      };
 
-    const newUser = await createUser(user);
+      console.log("Creating user:", user);
+      const newUser = await createUser(user);
+      console.log("User created:", newUser);
 
-    // Set public metadata
-    if (newUser) {
-      await clerkClient.users.updateUserMetadata(id, {
-        publicMetadata: {
-          userId: newUser._id,
-        },
-      });
+      if (newUser) {
+        await clerkClient.users.updateUserMetadata(id, {
+          publicMetadata: {
+            userId: newUser._id,
+          },
+        });
+      }
+
+      return NextResponse.json({ message: "OK", user: newUser });
+    } catch (error) {
+      console.error("Error creating user:", error);
+      return new Response("Error creating user", { status: 500 });
     }
-
-    return NextResponse.json({ message: "OK", user: newUser });
   }
 
   // UPDATE
   if (eventType === "user.updated") {
-    const { id, image_url, first_name, last_name, username } = evt.data;
+    try {
+      const { id, image_url, first_name, last_name, username } = evt.data;
 
-    const user = {
-      firstName: first_name ?? '', 
-      lastName: last_name ?? '',
-      username: username!,
-      photo: image_url,
-    };
+      const user = {
+        firstName: first_name ?? '',
+        lastName: last_name ?? '',
+        username: username!,
+        photo: image_url,
+      };
 
-    const updatedUser = await updateUser(id, user)
+      console.log("Updating user:", id, user);
+      const updatedUser = await updateUser(id, user);
+      console.log("User updated:", updatedUser);
 
-    return NextResponse.json({ message: "OK", user: updatedUser });
+      return NextResponse.json({ message: "OK", user: updatedUser });
+    } catch (error) {
+      console.error("Error updating user:", error);
+      return new Response("Error updating user", { status: 500 });
+    }
   }
 
   // DELETE
   if (eventType === "user.deleted") {
-    const { id } = evt.data;
+    try {
+      const { id } = evt.data;
 
-    const deletedUser = await deleteUser(id!);
+      console.log("Deleting user:", id);
+      const deletedUser = await deleteUser(id!);
+      console.log("User deleted:", deletedUser);
 
-    return NextResponse.json({ message: "OK", user: deletedUser });
+      return NextResponse.json({ message: "OK", user: deletedUser });
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      return new Response("Error deleting user", { status: 500 });
+    }
   }
 
-  console.log(`Webhook with and ID of ${id} and type of ${eventType}`);
-  console.log("Webhook body:", body);
-
-  return new Response("", { status: 200 });
-
- 
+  console.log("Webhook processed successfully");
+  return new Response("Webhook processed", { status: 200 });
 }
