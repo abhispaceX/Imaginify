@@ -4,6 +4,7 @@
 import { useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "../ui/button";
+import { checkoutCredits } from "@/lib/actions/razorpay.actions";
 
 declare global {
   interface Window {
@@ -57,6 +58,13 @@ const Checkout = ({
 
   const onCheckout = async () => {
     const res = await loadRazorpayScript();
+    const transaction = {
+      plan,
+      amount,
+      credits,
+      buyerId,
+    };
+    await checkoutCredits(transaction);
 
     if (!res) {
       toast({
