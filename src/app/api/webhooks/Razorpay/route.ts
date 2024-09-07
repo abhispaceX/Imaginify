@@ -1,27 +1,25 @@
-// pages/api/razorpay-webhook.ts
-
-import { NextApiRequest, NextApiResponse } from 'next';
+import { NextRequest, NextResponse } from 'next/server';
 import { createTransaction } from '@/lib/actions/razorpay.actions';
 import Razorpay from 'razorpay';
 
-export async function POST(req: NextApiRequest, res: NextApiResponse) {
-  const razorpay = new Razorpay({
-    key_id: process.env.RAZORPAY_KEY_ID!,
-    key_secret: process.env.RAZORPAY_KEY_SECRET!,
-  });
+const razorpay = new Razorpay({
+  key_id: process.env.RAZORPAY_KEY_ID!,
+  key_secret: process.env.RAZORPAY_KEY_SECRET!,
+});
 
-  const signature = req.headers['x-razorpay-signature'] as string;
+export async function POST(req: NextRequest) {
+  const signature = req.headers.get('x-razorpay-signature') as string;
   const secret = process.env.RAZORPAY_WEBHOOK_SECRET!;
 
-  const body = JSON.stringify(req.body);
+  const body = await req.text();
 
   try {
     Razorpay.validateWebhookSignature(body, signature, secret);
 
-    const event = req.body.event;
+    const event = JSON.parse(body).event;
 
     if (event === 'payment.captured') {
-      const { id, amount, notes } = req.body.payload.payment.entity;
+      const { id, amount, notes } = JSON.parse(body).payload.payment.entity;
 
       const transaction = {
         razorpayId: id,
@@ -34,11 +32,11 @@ export async function POST(req: NextApiRequest, res: NextApiResponse) {
 
       const newTransaction = await createTransaction(transaction);
 
-      return res.status(200).json({ message: 'OK', transaction: newTransaction });
+      return NextResponse.json({ message: 'OK', transaction: newTransaction }, { status: 200 });
     }
 
-    res.status(200).send('Webhook handled');
+    return NextResponse.json({ message: 'Webhook handled' }, { status: 200 });
   } catch (error) {
-    return res.status(400).json({ error: 'Webhook signature verification failed' });
+    return NextResponse.json({ error: 'Webhook signature verification failed' }, { status: 400 });
   }
 }
