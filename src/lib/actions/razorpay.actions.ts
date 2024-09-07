@@ -8,7 +8,7 @@ import Transaction from '../Database/models/transaction.model';
 import { updateCredits } from './user.actions';
 
 const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID!,
+  key_id: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID!,
   key_secret: process.env.RAZORPAY_KEY_SECRET!,
 });
 
@@ -29,6 +29,7 @@ export async function checkoutCredits(transaction: CheckoutTransactionParams) {
     };
 
     const order = await razorpay.orders.create(options);
+   
 
     // Redirect to Razorpay checkout page
     redirect(`/razorpay-checkout?order_id=${order.id}`);
