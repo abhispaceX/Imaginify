@@ -34,7 +34,8 @@ export async function checkoutCredits(transaction: CheckoutTransactionParams) {
     // Redirect to Razorpay checkout page
     redirect(`/razorpay-checkout?order_id=${order.id}`);
   } catch (error) {
-    handleError(error);
+     console.log(error);
+
   }
 }
 

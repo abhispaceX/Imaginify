@@ -57,6 +57,7 @@ const Checkout = ({
   };
 
   const onCheckout = async () => {
+    console.log("onCheckout");
     const res = await loadRazorpayScript();
     const transaction = {
       plan,
@@ -64,7 +65,8 @@ const Checkout = ({
       credits,
       buyerId,
     };
-    await checkoutCredits(transaction);
+    console.log(transaction);
+    
 
     if (!res) {
       toast({
@@ -98,6 +100,7 @@ const Checkout = ({
         color: "#3399cc",
       },
     };
+    await checkoutCredits(transaction);
 
     const paymentObject = new window.Razorpay(options);
     paymentObject.open();
