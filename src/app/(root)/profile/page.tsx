@@ -18,7 +18,7 @@ const Profile = async ({ searchParams }: SearchParamProps) => {
 
   return (
     <>
-      <Header title="Profile" />
+      <Header subTitle={user.name} title="Profile" />
 
       <section className="profile">
         <div className="profile-balance">
