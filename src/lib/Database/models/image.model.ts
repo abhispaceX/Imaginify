@@ -4,20 +4,20 @@ import { Document, Types } from 'mongoose';
 
 import { model, models } from "mongoose";
 
-interface IImage extends Document {
+export interface IImage extends Document {
     title: string;
     transformationType: string;
     publicId: string;
-    secureUrl: URL;
+    secureURL: string;
     width?: number;
     height?: number;
     aspectRatio?: string;
     prompt?: string;
     config?: Record<string, unknown>; // Object type in TypeScript
-    transformationUrl?: URL;
+    transformationUrl?: string;
     colour?: string;
     author?: {
-        _id: Types.ObjectId;
+        _id: string;
         firstname: string;
         lastname: string;
 
@@ -26,17 +26,18 @@ interface IImage extends Document {
     updatedAt: Date;
 }
 
+
 const ImageSchema= new Schema({
     title:{type:String,required:true},
     transformationType: {type: String, required:true},
     publicId:{type: String, required:true},
-    secureUrl:{type: URL, required:true},
+    secureURL:{type: String, required:true},
     width:{type: Number},
     height:{type: Number},
     aspectRatio:{type: String},
     prompt:{type: String},
     config:{type: Object},
-    transformationUrl:{type: URL},
+    transformationUrl:{type: String},
     colour:{type: String},
     author: { type:Schema.Types.ObjectId,ref:'User'},
     createdAt:{type:Date, default:Date.now},

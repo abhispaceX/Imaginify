@@ -7,11 +7,11 @@ import { usePathname } from 'next/navigation'
 const Sidebar = () => {
   const pathName=usePathname()
   return (
-    <aside className=' sidebar' >
+    <aside className='fixed z-0 sidebar' >
 
-      <div className=' flex size-full flex-col ' >
+      <div className=' flex flex-col gap-4 ' >
         <Link href='/' className=' sidebar-logo'>
-        <img src='/assets/images/logo-text.svg' alt='logo' width={150}  height={28}/>
+        <img src='/assets/images/logo-text.svg' alt='logo' width={180}  height={28}/>
         </Link>
         <nav className='sidebar-nav' >
           <ul className=' sidebar-nav_elements ' >

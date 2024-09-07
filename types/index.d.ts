@@ -1,6 +1,4 @@
-/* eslint-disable no-unused-vars */
 
-// ====== USER PARAMS
 declare type CreateUserParams = {
     clerkId: string;
     email: string;
@@ -80,7 +78,7 @@ declare type CreateUserParams = {
   };
   
   declare type CreateTransactionParams = {
-    stripeId: string;
+    razorpayId: string;
     amount: number;
     credits: number;
     plan: string;
