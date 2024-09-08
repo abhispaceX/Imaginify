@@ -80,12 +80,7 @@ const Checkout = ({
         handler: async function (response: any) {
           try {
             // Create transaction and update credits
-            await createTransaction({
-              ...transaction,
-              razorpay_payment_id: response.razorpay_payment_id,
-              razorpay_order_id: response.razorpay_order_id,
-              razorpay_signature: response.razorpay_signature,
-            } as CreateTransactionParams);
+          
 
             toast({
               title: "Payment Successful!",
