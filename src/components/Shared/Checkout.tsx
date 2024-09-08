@@ -58,6 +58,7 @@ const Checkout = ({
         credits,
         buyerId,
         createdAt: new Date(),
+        razorpayId: "",
       };
 
       // Use the existing createRazorpayOrder function
