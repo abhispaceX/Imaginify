@@ -75,6 +75,7 @@ declare type CreateUserParams = {
     credits: number;
     amount: number;
     buyerId: string;
+   
   };
   
   declare type CreateTransactionParams = {
@@ -83,6 +84,9 @@ declare type CreateUserParams = {
     credits: number;
     plan: string;
     buyerId: string;
+    razorpay_payment_id?: string;
+    razorpay_order_id?: string;
+    razorpay_signature?: string;
     createdAt: Date;
   };
   

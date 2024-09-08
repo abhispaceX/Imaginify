@@ -12,32 +12,28 @@ const razorpay = new Razorpay({
   key_secret: process.env.RAZORPAY_KEY_SECRET!,
 });
 
-export async function checkoutCredits(transaction: CheckoutTransactionParams) {
-  const amount = Number(transaction.amount) * 100; // Convert to the smallest currency unit
 
+
+export const createRazorpayOrder = async (transaction: CreateTransactionParams) => {
   try {
-    const options = {
-      amount: amount, // Amount in paise
-      currency: 'INR',
-      receipt: `receipt_${transaction.buyerId}_${Date.now()}`,
-      payment_capture: 1, // Automatically capture the payment
-      notes: {
-        plan: transaction.plan,
-        credits: transaction.credits.toString(),
-        buyerId: transaction.buyerId,
+    const response = await fetch('/api/razorpay-order', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
       },
-    };
+      body: JSON.stringify(transaction),
+    });
 
-    const order = await razorpay.orders.create(options);
-   
+    if (!response.ok) {
+      throw new Error('Failed to create Razorpay order');
+    }
 
-    // Redirect to Razorpay checkout page
-    redirect(`/razorpay-checkout?order_id=${order.id}`);
+    return await response.json();
   } catch (error) {
-     console.log(error);
-
+    console.error('Error creating Razorpay order:', error);
+    throw error;
   }
-}
+};
 
 // Create Transaction function
 export async function createTransaction(transaction: CreateTransactionParams) {
@@ -46,7 +42,8 @@ export async function createTransaction(transaction: CreateTransactionParams) {
 
     // Create a new transaction with buyerId
     const newTransaction = await Transaction.create({
-      ...transaction, buyer: transaction.buyerId
+      ...transaction, buyer: transaction.buyerId,
+      status: "completed"
     });
 
     await updateCredits(transaction.buyerId, transaction.credits);

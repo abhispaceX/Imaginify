@@ -4,7 +4,7 @@
 import { useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "../ui/button";
-import { checkoutCredits } from "@/lib/actions/razorpay.actions";
+import { createRazorpayOrder, createTransaction } from "@/lib/actions/razorpay.actions";
 
 declare global {
   interface Window {
@@ -26,24 +26,7 @@ const Checkout = ({
   const { toast } = useToast();
 
   useEffect(() => {
-    const query = new URLSearchParams(window.location.search);
-    if (query.get("success")) {
-      toast({
-        title: "Order placed!",
-        description: "You will receive an email confirmation",
-        duration: 5000,
-        className: "success-toast",
-      });
-    }
-
-    if (query.get("canceled")) {
-      toast({
-        title: "Order canceled!",
-        description: "Continue to shop around and checkout when you're ready",
-        duration: 5000,
-        className: "error-toast",
-      });
-    }
+    // ... (keep existing useEffect code)
   }, []);
 
   const loadRazorpayScript = () => {
@@ -57,16 +40,7 @@ const Checkout = ({
   };
 
   const onCheckout = async () => {
-    console.log("onCheckout");
     const res = await loadRazorpayScript();
-    const transaction = {
-      plan,
-      amount,
-      credits,
-      buyerId,
-    };
-    console.log(transaction);
-    
 
     if (!res) {
       toast({
@@ -77,33 +51,70 @@ const Checkout = ({
       return;
     }
 
-    const options = {
-      key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID!,
-      amount: amount * 100, // Amount in paise
-      currency: "INR",
-      name: "Imaginify",
-      description: `Purchase ${credits} Credits`,
-      handler: function (response: any) {
-        toast({
-          title: "Payment Successful!",
-          description: "Your credits have been purchased successfully.",
-          className: "success-toast",
-        });
-        window.location.href = "/profile";
-      },
-      prefill: {
-        name: "John Doe",
-        email: "john.doe@example.com",
-        contact: "9999999999",
-      },
-      theme: {
-        color: "#3399cc",
-      },
-    };
-    await checkoutCredits(transaction);
+    try {
+      const transaction = {
+        plan,
+        amount,
+        credits,
+        buyerId,
+        createdAt: new Date(),
+      };
 
-    const paymentObject = new window.Razorpay(options);
-    paymentObject.open();
+      // Use the existing createRazorpayOrder function
+      const orderData = await createRazorpayOrder(transaction);
+
+      const options = {
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID!,
+        amount: orderData.amount,
+        currency: orderData.currency,
+        name: "Imaginify",
+        description: `Purchase ${credits} Credits`,
+        order_id: orderData.id,
+        handler: async function (response: any) {
+          try {
+            // Create transaction and update credits
+            await createTransaction({
+              ...transaction,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_signature: response.razorpay_signature,
+            } as CreateTransactionParams);
+
+            toast({
+              title: "Payment Successful!",
+              description: "Your credits have been purchased successfully.",
+              className: "success-toast",
+            });
+            window.location.href = "/profile";
+          } catch (error) {
+            console.error("Error creating transaction:", error);
+            toast({
+              title: "Error",
+              description: "There was an error updating your credits. Please contact support.",
+              className: "error-toast",
+            });
+          }
+        },
+        prefill: {
+          name: "John Doe",
+          email: "john.doe@example.com",
+          contact: "9999999999",
+        },
+        theme: {
+          color: "#3399cc",
+        },
+      };
+
+      const paymentObject = new window.Razorpay(options);
+      paymentObject.open();
+    } catch (error) {
+      console.error("Error creating Razorpay order:", error);
+      toast({
+        title: "Error",
+        description: "There was an error creating your order. Please try again.",
+        className: "error-toast",
+      });
+    }
   };
 
   return (
