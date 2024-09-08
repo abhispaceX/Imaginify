@@ -37,10 +37,12 @@ export const createRazorpayOrder = async (transaction: CreateTransactionParams) 
 
 // Create Transaction function
 export async function createTransaction(transaction: CreateTransactionParams) {
+  console.log('transaction', transaction.credits);
   try {
     await connectToDatabase();
+    console.log('transaction', transaction.credits);
 
-    // Create a new transaction with buyerId
+    
     const newTransaction = await Transaction.create({
       ...transaction, buyer: transaction.buyerId,
       status: "completed"

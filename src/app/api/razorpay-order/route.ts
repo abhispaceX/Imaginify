@@ -6,10 +6,10 @@ export async function POST(req: NextRequest) {
   try {
     // Connect to the database
     await connectToDatabase();
-    console.log('Database connected successfully');
+  
 
     const body = await req.json();
-    console.log('Received body:', body);
+  
     const razorpay = new Razorpay({
       key_id: process.env.RAZORPAY_KEY_ID as string,
       key_secret: process.env.RAZORPAY_KEY_SECRET as string,

@@ -10,7 +10,7 @@ import { handleError } from "../utils";
 export async function createUser(user: CreateUserParams) {
   try {
     await connectToDatabase();
-    console.log('connected to database')
+    
 
     const newUser = await User.create(user);
 
@@ -77,11 +77,13 @@ export async function deleteUser(clerkId: string) {
 
 // USE CREDITS
 export async function updateCredits(userId: string, creditFee: number) {
+  console.log('userId', userId);
+  console.log('creditFee', creditFee);
   try {
     await connectToDatabase();
 
     const updatedUserCredits = await User.findOneAndUpdate(
-      { _id: userId },
+      { clerkId: userId },
       { $inc: { creditBalance: creditFee }},
       { new: true }
     )

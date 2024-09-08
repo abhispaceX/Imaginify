@@ -63,7 +63,7 @@ const Checkout = ({
 
       // Use the existing createRazorpayOrder function
       const orderData = await createRazorpayOrder(transaction);
-      console.log(orderData);
+      
 
       const options = {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID!,
@@ -72,6 +72,11 @@ const Checkout = ({
         name: "Imaginify",
         description: `Purchase ${credits} Credits`,
         order_id: orderData.id,
+        notes: {
+          plan: plan,
+          credits: credits,
+          buyerId: buyerId,
+        },
         handler: async function (response: any) {
           try {
             // Create transaction and update credits

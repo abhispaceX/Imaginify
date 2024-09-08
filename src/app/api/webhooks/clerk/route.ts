@@ -53,7 +53,7 @@ export async function POST(req: Request) {
       "svix-timestamp": svix_timestamp,
       "svix-signature": svix_signature,
     }) as WebhookEvent;
-    console.log("Webhook verified successfully");
+    
   } catch (err) {
     console.error("Error verifying webhook:", err);
     return new Response("Error verifying webhook", {
@@ -64,7 +64,7 @@ export async function POST(req: Request) {
   // Connect to the database
   try {
     await connectToDatabase();
-    console.log("Connected to database");
+   
   } catch (error) {
     console.error("Error connecting to database:", error);
     return new Response("Error connecting to database", { status: 500 });
@@ -73,7 +73,7 @@ export async function POST(req: Request) {
   // Get the ID and type
   const { id } = evt.data;
   const eventType = evt.type;
-  console.log(`Webhook with ID of ${id} and type of ${eventType}`);
+ 
 
   // CREATE
   if (eventType === "user.created") {
@@ -89,9 +89,9 @@ export async function POST(req: Request) {
         photo: image_url,
       };
 
-      console.log("Creating user:", user);
+    
       const newUser = await createUser(user);
-      console.log("User created:", newUser);
+      
 
       if (newUser) {
         await clerkClient.users.updateUserMetadata(id, {
@@ -120,9 +120,9 @@ export async function POST(req: Request) {
         photo: image_url,
       };
 
-      console.log("Updating user:", id, user);
+     
       const updatedUser = await updateUser(id, user);
-      console.log("User updated:", updatedUser);
+      
 
       return NextResponse.json({ message: "OK", user: updatedUser });
     } catch (error) {
@@ -136,9 +136,9 @@ export async function POST(req: Request) {
     try {
       const { id } = evt.data;
 
-      console.log("Deleting user:", id);
+     
       const deletedUser = await deleteUser(id!);
-      console.log("User deleted:", deletedUser);
+     
 
       return NextResponse.json({ message: "OK", user: deletedUser });
     } catch (error) {
@@ -147,6 +147,6 @@ export async function POST(req: Request) {
     }
   }
 
-  console.log("Webhook processed successfully");
+  
   return new Response("Webhook processed", { status: 200 });
 }
