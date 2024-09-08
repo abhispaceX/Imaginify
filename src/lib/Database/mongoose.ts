@@ -1,6 +1,9 @@
 import mongoose, {Mongoose} from "mongoose";
 
-const Mongo_Url=process.env.MONGO_URI
+const Mongo_Url='mongodb+srv://abhiramgaddam13:DA6octpH8KhiC2xA@users.bj2r7dr.mongodb.net/?retryWrites=true&w=majority&appName=users'
+
+
+
 
 interface MongooseConnection{
     conn: Mongoose|null
@@ -22,7 +25,7 @@ export const connectToDatabase= async()=>{
 
     }
     if(!Mongo_Url){
-        throw new Error("Please define the MONGO_URI environment variable inside .env.local")
+        throw new Error("error in connecting to database")
     }
 
     cached.promise=mongoose.connect(Mongo_Url,{dbName:'Imaginify', bufferCommands:false})

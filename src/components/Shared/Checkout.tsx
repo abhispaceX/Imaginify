@@ -63,6 +63,7 @@ const Checkout = ({
 
       // Use the existing createRazorpayOrder function
       const orderData = await createRazorpayOrder(transaction);
+      console.log(orderData);
 
       const options = {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID!,
