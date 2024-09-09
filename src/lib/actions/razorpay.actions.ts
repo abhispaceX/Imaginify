@@ -44,13 +44,13 @@ export async function createTransaction(transaction: CreateTransactionParams) {
 
     const newTransaction = await Transaction.create({
       ...transaction,
-      buyer: transaction.buyerId,
+      buyer: transaction.buyer,
       status: "completed"
     });
     console.log('New transaction created:', newTransaction);
 
-    console.log('Calling updateCredits with:', transaction.buyerId, transaction.credits);
-    const updatedUser = await updateCredits(transaction.buyerId, transaction.credits);
+    console.log('Calling updateCredits with:', transaction.buyer, transaction.credits);
+    const updatedUser = await updateCredits(transaction.buyer, transaction.credits);
     console.log('updateCredits result:', updatedUser);
 
     return JSON.parse(JSON.stringify(newTransaction));

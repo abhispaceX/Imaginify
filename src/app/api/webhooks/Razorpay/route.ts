@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
         amount: amount / 100, // Convert paise to rupees
         plan: notes.plan,
         credits: credits,
-        buyerId: notes.buyerId,
+        buyer: notes.buyerId,
         createdAt: new Date(),
       };
       console.log('Transaction object created:', transaction);

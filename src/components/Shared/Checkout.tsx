@@ -56,7 +56,7 @@ const Checkout = ({
         plan,
         amount,
         credits,
-        buyerId,
+        buyer: buyerId,
         createdAt: new Date(),
         transactionId: "",
         paymentProvider: "razorpay" as const,

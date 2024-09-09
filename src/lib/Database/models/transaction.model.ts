@@ -23,13 +23,14 @@ const TransactionSchema = new Schema({
   },
   credits: {
     type: Number,
+    required: true,
     validate: {
       validator: Number.isFinite,
       message: '{VALUE} is not a valid number for credits'
     }
   },
   buyer: {
-    type: Schema.Types.ObjectId,
+    type: String,
     ref: "User",
   },
 });

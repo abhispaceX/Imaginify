@@ -74,7 +74,7 @@ declare type CreateUserParams = {
     plan: string;
     credits: number;
     amount: number;
-    buyerId: string;
+    buyer: string;
    
   };
   
@@ -84,7 +84,7 @@ declare type CreateUserParams = {
     amount: number;
     plan?: string;
     credits: number;
-    buyerId: string;
+    buyer: string;
     createdAt: Date;
   };
   
