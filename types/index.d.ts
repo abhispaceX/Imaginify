@@ -79,14 +79,12 @@ declare type CreateUserParams = {
   };
   
   declare type CreateTransactionParams = {
-    razorpayId: string;
+    transactionId: string;
+    paymentProvider: 'razorpay';
     amount: number;
+    plan?: string;
     credits: number;
-    plan: string;
     buyerId: string;
-    razorpay_payment_id?: string;
-    razorpay_order_id?: string;
-    razorpay_signature?: string;
     createdAt: Date;
   };
   

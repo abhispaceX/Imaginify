@@ -23,15 +23,20 @@ export async function POST(req: NextRequest) {
     console.log('Webhook event:', event);
 
     if (event === 'payment.captured') {
-      const { id, amount, credits,plan,buyerId } = JSON.parse(body).payload.payment.entity;
-      console.log('Payment captured:', { id, amount, credits,plan,buyerId });
+      const { id, amount, notes } = JSON.parse(body).payload.payment.entity;
+      console.log('Payment captured:', { id, amount, notes });
+      const credits = Number(notes.credits);
+      if (isNaN(credits)) {
+        throw new Error('Invalid credits value');
+      }
 
       const transaction = {
-        razorpayId: id,
+        transactionId: id,
+        paymentProvider: 'razorpay'as const,
         amount: amount / 100, // Convert paise to rupees
-        plan: plan,
-        credits: Number(credits),
-        buyerId: buyerId,
+        plan: notes.plan,
+        credits: credits,
+        buyerId: notes.buyerId,
         createdAt: new Date(),
       };
       console.log('Transaction object created:', transaction);

@@ -5,10 +5,14 @@ const TransactionSchema = new Schema({
     type: Date,
     default: Date.now,
   },
-  stripeId: {
+  transactionId: {
     type: String,
-    required: true,
     unique: true,
+  },
+  paymentProvider: {
+    type: String,
+    enum: ['stripe', 'razorpay'],
+    required: true,
   },
   amount: {
     type: Number,
@@ -19,6 +23,10 @@ const TransactionSchema = new Schema({
   },
   credits: {
     type: Number,
+    validate: {
+      validator: Number.isFinite,
+      message: '{VALUE} is not a valid number for credits'
+    }
   },
   buyer: {
     type: Schema.Types.ObjectId,
