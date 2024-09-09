@@ -9,6 +9,7 @@ export async function POST(req: NextRequest) {
   
 
     const body = await req.json();
+    console.log(body);
   
     const razorpay = new Razorpay({
       key_id: process.env.RAZORPAY_KEY_ID as string,
