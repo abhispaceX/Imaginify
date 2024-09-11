@@ -8,10 +8,11 @@ const TransactionSchema = new Schema({
   transactionId: {
     type: String,
     unique: true,
+    required: true,
   },
   paymentProvider: {
     type: String,
-    enum: ['razorpay'],  // Removed 'stripe'
+    enum: ['razorpay'],
     required: true,
   },
   amount: {
@@ -32,8 +33,9 @@ const TransactionSchema = new Schema({
   buyer: {
     type: String,
     ref: "User",
+    required: true,
   },
-});
+}, { strict: false });  // This allows fields not in the schema
 
 const Transaction = models?.Transaction || model("Transaction", TransactionSchema);
 
