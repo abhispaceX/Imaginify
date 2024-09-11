@@ -31,8 +31,8 @@ export async function POST(req: NextRequest) {
       }
 
       const transaction = {
-        transactionId: id,
-        paymentProvider: 'razorpay'as const,
+        transactionId: id,  // Ensure transactionId is set
+        paymentProvider: 'razorpay' as const,
         amount: amount / 100, // Convert paise to rupees
         plan: notes.plan,
         credits: credits,

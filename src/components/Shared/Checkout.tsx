@@ -24,13 +24,8 @@ const Checkout = ({
   buyerId: string;
 }) => {
   const { toast } = useToast();
-
-  useEffect(() => {
-    // ... (keep existing useEffect code)
-  }, []);
-
   const loadRazorpayScript = () => {
-    return new Promise((resolve) => {
+    return new Promise<boolean>((resolve) => {
       const script = document.createElement("script");
       script.src = "https://checkout.razorpay.com/v1/checkout.js";
       script.onload = () => resolve(true);
@@ -38,6 +33,12 @@ const Checkout = ({
       document.body.appendChild(script);
     });
   };
+
+   useEffect(() => {
+   
+    loadRazorpayScript();
+  }, []);
+ 
 
   const onCheckout = async () => {
     const res = await loadRazorpayScript();

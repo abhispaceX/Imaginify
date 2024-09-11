@@ -11,7 +11,7 @@ const TransactionSchema = new Schema({
   },
   paymentProvider: {
     type: String,
-    enum: ['stripe', 'razorpay'],
+    enum: ['razorpay'],  // Removed 'stripe'
     required: true,
   },
   amount: {
